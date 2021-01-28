@@ -272,7 +272,6 @@ class CatalogPage(Page):
             external_course_qset,
             external_program_qset,
         )
-        print([c.course.live for c in course_pages])
         return dict(
             **super().get_context(request),
             **get_base_context(request),
