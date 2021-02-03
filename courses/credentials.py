@@ -22,18 +22,33 @@ log = logging.getLogger(__name__)
 def build_program_credential(certificate: ProgramCertificate) -> Dict:
     """Build a credential object for a ProgramCertificate"""
     start_date, end_date = certificate.start_end_dates
+
+    if not start_date or not end_date:
+        raise Exception("Program has no start or end date")
+
+    if not certificate.program.page:
+        raise Exception("Program has no CMS program page")
+
+    if not certificate.program.page.certificate_page:
+        raise Exception("Program has no CMS program certificate page")
+
+    if not certificate.program.page.certificate_page.CEUs:
+        raise Exception("Program has no CEUs defined")
+
     return {
-        "type": "schema:EducationalOccupationalProgram",
-        "identifier": certificate.program.text_id,
-        "name": certificate.program.title,
+        "type": ["EducationalOccupationalCredential", "ProgramCompletionCredential"],
+        "name": f"{certificate.program.title} Completion",
         "description": certificate.program.page.description,
-        "numberOfCredits": {"value": certificate.program.page.certificate_page.CEUs},
-        "startDate": start_date,
-        "endDate": end_date,
-        "educationalCredentialAwarded": {
-            "type": "schema:EducationalOccupationalCredential",
-            "name": f"{certificate.program.title} Completion",
+        "awardedOnCompletionOf": {
+            "identifier": certificate.program.text_id,
+            "type": "EducationalOccupationalProgram",
+            "name": certificate.program.title,
             "description": certificate.program.page.description,
+            "numberOfCredits": {
+                "value": certificate.program.page.certificate_page.CEUs
+            },
+            "startDate": start_date.isoformat(),
+            "endDate": end_date.isoformat(),
         },
     }
 
@@ -42,14 +57,32 @@ def build_course_run_credential(certificate: CourseRunCertificate) -> Dict:
     """Build a credential object for a CourseRunCertificate"""
     course = certificate.course_run.course
     start_date, end_date = certificate.start_end_dates
+
+    if not start_date or not end_date:
+        raise Exception("CourseRun has no start or end date")
+
+    if not course.page:
+        raise Exception("Course has no CMS course page")
+
+    if not course.page.certificate_page:
+        raise Exception("Course has no CMS course certificate page")
+
+    if not course.page.certificate_page.CEUs:
+        raise Exception("Course has no CEUs defined")
+
     return {
-        "type": "schema:Course",
-        "courseCode": course.readable_id,
-        "name": course.title,
+        "type": ["EducationalOccupationalCredential", "CourseCompletionCredential"],
+        "name": f"{course.title} Completion",
         "description": course.page.description,
-        "numberOfCredits": {"value": course.page.certificate_page.CEUs},
-        "startDate": start_date,
-        "endDate": end_date,
+        "awardedOnCompletionOf": {
+            "type": ["Course", "Event"],
+            "courseCode": course.readable_id,
+            "name": course.title,
+            "description": course.page.description,
+            "numberOfCredits": {"value": course.page.certificate_page.CEUs},
+            "startDate": start_date.isoformat(),
+            "endDate": end_date.isoformat(),
+        },
     }
 
 
@@ -71,10 +104,12 @@ def build_digital_credential(
         "credential": {
             "@context": [
                 "https://www.w3.org/2018/credentials/v1",
-                "https://w3c-ccg.github.io/vc-ed-models/contexts/v1/context.json",
+                "https://www.w3.org/2018/credentials/examples/v1",
+                "https://w3c-ccg.github.io/lds-jws2020/contexts/lds-jws2020-v1.json",
+                "https://w3id.org/dcc/v1",
             ],
             "id": urljoin(settings.SITE_BASE_URL, certificate.link),
-            "type": ["VerifiableCredential", "Assertion"],
+            "type": ["VerifiableCredential", "LearningCredential"],
             "issuer": {
                 "type": "Issuer",
                 "id": settings.DIGITAL_CREDENTIALS_ISSUER_ID,
@@ -153,7 +188,7 @@ def send_digital_credential_request_notification(
         courseware_title = certificate.course_run.course.title
     else:
         log.error(
-            "Unhandled certified_object for digital credential request: %s",
+            "Unhandled credentialed_object for digital credential request: %s",
             credential_request,
         )
         return

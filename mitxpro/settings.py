@@ -996,6 +996,7 @@ OAUTH2_PROVIDER = {
     },
     "DEFAULT_SCOPES": ["user:read"],
     "SCOPES_BACKEND_CLASS": "mitol.oauth_toolkit_extensions.backends.ApplicationAccessOrSettingsScopes",
+    "ERROR_RESPONSE_WITH_SCOPES": DEBUG,
 }
 
 
