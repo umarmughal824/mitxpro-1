@@ -55,18 +55,22 @@ def test_build_program_credential(user):
     }
 
 
-@pytest.mark.parametrize("kwargs, error_message", [
-    ({"page": None}, "Program has no CMS program page"),
-    ({"page__certificate_page": None}, "Program has no CMS program certificate page"),
-    ({"page__certificate_page__CEUs": None}, "Program has no CEUs defined"),
-])
+@pytest.mark.parametrize(
+    "kwargs, error_message",
+    [
+        ({"page": None}, "Program has no CMS program page"),
+        (
+            {"page__certificate_page": None},
+            "Program has no CMS program certificate page",
+        ),
+        ({"page__certificate_page__CEUs": None}, "Program has no CEUs defined"),
+    ],
+)
 def test_build_program_credential_error(user, kwargs, error_message):
     """Verify build_program_credential errors with invalid state"""
     program = ProgramFactory.create(**kwargs)
     certificate = ProgramCertificateFactory.create(user=user, program=program)
-    CourseRunCertificateFactory.create(
-        user=user, course_run__course__program=program
-    )
+    CourseRunCertificateFactory.create(user=user, course_run__course__program=program)
     with pytest.raises(Exception) as exc_info:
         build_program_credential(certificate)
 
@@ -104,13 +108,19 @@ def test_build_course_run_credential():
     }
 
 
-@pytest.mark.parametrize("kwargs, error_message", [
-    ({"course__page": None}, "Course has no CMS course page"),
-    ({"course__page__certificate_page": None}, "Course has no CMS course certificate page"),
-    ({"course__page__certificate_page__CEUs": None}, "Course has no CEUs defined"),
-    ({"start_date": None}, "CourseRun has no start or end date"),
-    ({"end_date": None}, "CourseRun has no start or end date")
-])
+@pytest.mark.parametrize(
+    "kwargs, error_message",
+    [
+        ({"course__page": None}, "Course has no CMS course page"),
+        (
+            {"course__page__certificate_page": None},
+            "Course has no CMS course certificate page",
+        ),
+        ({"course__page__certificate_page__CEUs": None}, "Course has no CEUs defined"),
+        ({"start_date": None}, "CourseRun has no start or end date"),
+        ({"end_date": None}, "CourseRun has no start or end date"),
+    ],
+)
 def test_build_course_run_credential_error(kwargs, error_message):
     """Verify build_course_run_credential errors with invalid state"""
     course_run = CourseRunFactory.create(**kwargs)
