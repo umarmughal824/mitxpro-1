@@ -1410,6 +1410,11 @@ SHEETS_REFUND_SKIP_ROW_COL = get_int(
 )
 
 # Digital Credentials
+DIGITAL_CREDENTIALS_OAUTH2_CLIENT_ID = get_string(
+    name="DIGITAL_CREDENTIALS_OAUTH2_CLIENT_ID",
+    default=None,
+    description="The client id for the oauth2 application digital credentials uses",
+)
 DIGITAL_CREDENTIALS_DEEP_LINK_URL = get_string(
     name="DIGITAL_CREDENTIALS_DEEP_LINK_URL",
     default=None,
