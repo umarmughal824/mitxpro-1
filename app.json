@@ -285,11 +285,11 @@
     },
     "MITOL_DIGITAL_CREDENTIALS_HMAC_SECRET": {
       "description": "HMAC secret to sign digital credentials requests with",
-      "required": true
+      "required": false
     },
     "MITOL_DIGITAL_CREDENTIALS_VERIFY_SERVICE_BASE_URL": {
       "description": "Base URL for sing-and-verify service to call for digital credentials",
-      "required": true
+      "required": false
     },
     "MITXPRO_ADMIN_EMAIL": {
       "description": "E-mail to send 500 reports to.",
