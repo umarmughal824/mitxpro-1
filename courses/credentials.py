@@ -155,8 +155,11 @@ def create_and_notify_digital_credential_request(
 def create_deep_link_url(credential_request: DigitalCredentialRequest) -> str:
     """Creates and returns a deep link credential url"""
     params = {
+        "authentication_url": urljoin(
+            settings.SITE_BASE_URL, reverse("oauth2_provider:authorize")
+        ),
         "token_url": urljoin(settings.SITE_BASE_URL, reverse("oauth2_provider:token")),
-        "request_url": urljoin(
+        "credential_request_url": urljoin(
             settings.SITE_BASE_URL,
             reverse(
                 "digital-credentials:credentials-request",
@@ -167,19 +170,6 @@ def create_deep_link_url(credential_request: DigitalCredentialRequest) -> str:
     }
 
     return f"{settings.DIGITAL_CREDENTIALS_DEEP_LINK_URL}?{urlencode(params)}"
-
-
-def create_notification_email_url(credential_request: DigitalCredentialRequest) -> str:
-    """Creates and returns an email notification url"""
-    params = {
-        "client_id": settings.DIGITAL_CREDENTIALS_OAUTH2_CLIENT_ID,
-        "response_type": "code",
-        "redirect_uri": create_deep_link_url(credential_request),
-    }
-
-    auth_url = urljoin(settings.SITE_BASE_URL, reverse("oauth2_provider:authorize"))
-
-    return f"{auth_url}?{urlencode(params)}"
 
 
 def send_digital_credential_request_notification(
@@ -203,10 +193,10 @@ def send_digital_credential_request_notification(
         )
         return
 
-    link_url = create_notification_email_url(credential_request)
+    deep_link_url = create_deep_link_url(credential_request)
 
     with get_message_sender(DigitalCredentialAvailableMessage) as sender:
         sender.build_and_send_message(
             credential_request.learner,
-            {"courseware_title": courseware_title, "link_url": link_url},
+            {"courseware_title": courseware_title, "deep_link_url": deep_link_url},
         )

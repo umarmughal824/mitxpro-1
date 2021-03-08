@@ -344,9 +344,7 @@ def test_send_digital_credential_request_notification(
     mock_log = mocker.patch("courses.credentials.log")
     mock_get_message_sender = mocker.patch("courses.credentials.get_message_sender")
     mock_sender = mock_get_message_sender.return_value.__enter__.return_value
-    mock_create_deep_link_url = mocker.patch(
-        "courses.credentials.create_notification_email_url"
-    )
+    mock_create_deep_link_url = mocker.patch("courses.credentials.create_deep_link_url")
 
     send_digital_credential_request_notification(credential_request)
 
@@ -366,7 +364,7 @@ def test_send_digital_credential_request_notification(
             credential_request.learner,
             {
                 "courseware_title": "credential title",
-                "link_url": mock_create_deep_link_url.return_value,
+                "deep_link_url": mock_create_deep_link_url.return_value,
             },
         )
 
