@@ -3,7 +3,6 @@ from urllib.parse import parse_qs, urljoin, urlparse
 
 import pytest
 from django.db.models.signals import post_save
-from django.shortcuts import reverse
 from factory.django import mute_signals
 from mitol.common.pytest_utils import any_instance_of
 from mitol.digitalcredentials.factories import (
@@ -18,7 +17,6 @@ from courses.credentials import (
     build_program_credential,
     create_and_notify_digital_credential_request,
     create_deep_link_url,
-    create_notification_email_url,
     send_digital_credential_request_notification,
 )
 from courses.factories import (
@@ -283,42 +281,12 @@ def test_create_deep_link_url(settings, factory, user):
     assert scheme == "scheme"
     assert path == "site"
     assert parse_qs(query) == {
-        "token_url": ["http://localhost:8053/oauth2/token/"],
+        "issuer": [settings.SITE_BASE_URL],
         "request_url": [
             f"http://localhost:8053/api/v1/credentials/request/{credential_request.uuid}/"
         ],
         "challenge": [str(credential_request.uuid)],
     }
-
-
-@pytest.mark.parametrize(
-    "factory", [ProgramCertificateFactory, CourseRunCertificateFactory]
-)
-def test_create_notification_email_url(mocker, settings, factory, user):
-    """Test create_notification_email_url()"""
-    mock_create_deep_link_url = mocker.patch(
-        "courses.credentials.create_deep_link_url", return_value="/deep/link"
-    )
-    certificate = factory.create()
-    credential_request = DigitalCredentialRequestFactory.create(
-        learner=user, credentialed_object=certificate
-    )
-
-    settings.DIGITAL_CREDENTIALS_OAUTH2_CLIENT_ID = "oauth-client"
-
-    url = create_notification_email_url(credential_request)
-
-    scheme, netloc, path, _, query, _ = urlparse(url)
-
-    assert scheme == "http"
-    assert netloc == "localhost:8053"
-    assert path == reverse("oauth2_provider:authorize")
-    assert parse_qs(query) == {
-        "client_id": ["oauth-client"],
-        "response_type": ["code"],
-        "redirect_uri": [mock_create_deep_link_url.return_value],
-    }
-    mock_create_deep_link_url.assert_called_once_with(credential_request)
 
 
 @pytest.mark.parametrize("enabled", [True, False])

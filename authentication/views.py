@@ -1,12 +1,12 @@
 """Authentication views"""
-from urllib.parse import quote, urlparse, urlencode
+from urllib.parse import quote, urlparse, urlencode, urljoin
 
 import requests
 from django.conf import settings
 from django.core import mail as django_mail
 from django.contrib.auth import get_user_model, update_session_auth_hash
 from django.contrib.auth.views import LogoutView
-from django.shortcuts import render
+from django.shortcuts import render, reverse
 from social_core.backends.email import EmailAuth
 from social_django.models import UserSocialAuth
 from social_django.utils import load_backend
@@ -237,3 +237,22 @@ class CustomLogoutView(LogoutView):
             params = {"redirect_url": settings.SITE_BASE_URL}
             next_page += ("&" if urlparse(next_page).query else "?") + urlencode(params)
             return next_page
+
+
+@api_view(["GET"])
+def well_known_openid_configuration(request):
+    """View for openid configuration"""
+    # See: https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig
+    # NOTE: this is intentionally incomplete because we don't fully support OpenID
+    #       this was implemented solely for digital credentials
+    return Response(
+        {
+            "issuer": settings.SITE_BASE_URL,
+            "authorization_endpoint": urljoin(
+                settings.SITE_BASE_URL, reverse("oauth2_provider:authorize")
+            ),
+            "token_endpoint": urljoin(
+                settings.SITE_BASE_URL, reverse("oauth2_provider:token")
+            ),
+        }
+    )

@@ -155,11 +155,8 @@ def create_and_notify_digital_credential_request(
 def create_deep_link_url(credential_request: DigitalCredentialRequest) -> str:
     """Creates and returns a deep link credential url"""
     params = {
-        "authentication_url": urljoin(
-            settings.SITE_BASE_URL, reverse("oauth2_provider:authorize")
-        ),
-        "token_url": urljoin(settings.SITE_BASE_URL, reverse("oauth2_provider:token")),
-        "credential_request_url": urljoin(
+        "issuer": settings.SITE_BASE_URL,
+        "request_url": urljoin(
             settings.SITE_BASE_URL,
             reverse(
                 "digital-credentials:credentials-request",
