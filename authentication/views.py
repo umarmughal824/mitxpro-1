@@ -13,8 +13,9 @@ from social_django.utils import load_backend
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, renderer_classes
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.renderers import JSONRenderer
 from anymail.message import AnymailMessage
 from djoser.views import (
     PasswordResetView as DjoserPasswordResetView,
@@ -240,6 +241,8 @@ class CustomLogoutView(LogoutView):
 
 
 @api_view(["GET"])
+@renderer_classes([JSONRenderer])
+@permission_classes([])
 def well_known_openid_configuration(request):
     """View for openid configuration"""
     # See: https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig
@@ -254,5 +257,6 @@ def well_known_openid_configuration(request):
             "token_endpoint": urljoin(
                 settings.SITE_BASE_URL, reverse("oauth2_provider:token")
             ),
-        }
+        },
+        content_type="application/json",
     )

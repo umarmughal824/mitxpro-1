@@ -281,6 +281,7 @@ def test_create_deep_link_url(settings, factory, user):
     assert scheme == "scheme"
     assert path == "site"
     assert parse_qs(query) == {
+        "auth_type": ["code"],
         "issuer": [settings.SITE_BASE_URL],
         "request_url": [
             f"http://localhost:8053/api/v1/credentials/request/{credential_request.uuid}/"

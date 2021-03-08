@@ -155,6 +155,7 @@ def create_and_notify_digital_credential_request(
 def create_deep_link_url(credential_request: DigitalCredentialRequest) -> str:
     """Creates and returns a deep link credential url"""
     params = {
+        "auth_type": "code",
         "issuer": settings.SITE_BASE_URL,
         "request_url": urljoin(
             settings.SITE_BASE_URL,
