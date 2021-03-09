@@ -89,7 +89,7 @@ django-ipware==3.0.0
     # via -r requirements.in
 django-modelcluster==5.0.1
     # via wagtail
-django-oauth-toolkit==1.2.0
+django-oauth-toolkit==1.4.0
     # via
     #   -r requirements.in
     #   mitol-django-digital-credentials
@@ -258,8 +258,6 @@ pynacl==1.3.0
     # via -r requirements.in
 pyopenssl==17.5.0
     # via django-server-status
-pyparsing==2.4.7
-    # via httplib2
 python-dateutil==2.5.3
     # via
     #   botocore
