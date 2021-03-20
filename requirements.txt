@@ -111,9 +111,10 @@ django==2.2.13
     #   django-taggit
     #   django-treebeard
     #   django-user-agents
+    #   djangorestframework
     #   mitol-django-common
     #   wagtail
-djangorestframework==3.9.4
+djangorestframework==3.11.2
     # via
     #   -r requirements.in
     #   wagtail
