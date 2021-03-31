@@ -171,7 +171,7 @@ kombu==4.6.3
     #   django-server-status
 l18n==2020.6.1
     # via wagtail
-lxml==4.6.2
+lxml==4.6.3
     # via zeep
 mitol-django-common==0.3.0
     # via -r requirements.in
